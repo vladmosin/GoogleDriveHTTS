@@ -47,24 +47,31 @@ def step5(client_id, client_secret, code_verifier, code):
         'code_verifier': code_verifier
     }
     r = requests.post(url, params=params)
-    # print(r.status_code)
 
-    # print(r.text)
     data = json.loads(r.text)
 
     access_token = data['access_token']
     # print(f'Access token = {access_token}')
 
+    pageToken = ''
     get_url = 'https://www.googleapis.com/drive/v2/files'
-    get_params = {
-        'access_token': access_token,
-        'q': '"root" in parents'
-    }
-    get_r = requests.get(get_url, params=get_params)
 
-    content = json.loads(get_r.content)['items']
-    for item in content:
-        print(item['title'])
+    while True:
+        get_params = {
+            'access_token': access_token,
+            'q': '"root" in parents',
+            'maxResults': 20
+        }
+        if len(pageToken) > 0:
+            get_params['pageToken'] = pageToken
+        get_r = requests.get(get_url, params=get_params)
+        content = json.loads(get_r.content)
+        for item in content['items']:
+            print(item['title'])
+        print('======================================')
+        if 'nextPageToken' not in content:
+            break
+        pageToken = content['nextPageToken']
 
 
 if __name__ == '__main__':
