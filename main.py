@@ -2,6 +2,7 @@ import argparse
 import requests
 from secrets import token_urlsafe
 import json
+import webbrowser
 
 
 def parse_arguments():
@@ -27,9 +28,7 @@ def step2(client_id):
     }
 
     r = requests.post(url, params=params)
-
-    print('Go to:')
-    print(r.url)
+    webbrowser.open(r.url, new=2)
 
     print('Enter code:')
     code = input()
@@ -48,13 +47,13 @@ def step5(client_id, client_secret, code_verifier, code):
         'code_verifier': code_verifier
     }
     r = requests.post(url, params=params)
-    print(r.status_code)
+    # print(r.status_code)
 
-    print(r.text)
+    # print(r.text)
     data = json.loads(r.text)
 
     access_token = data['access_token']
-    print(f'Access token = {access_token}')
+    # print(f'Access token = {access_token}')
 
     get_url = 'https://www.googleapis.com/drive/v2/files'
     get_params = {
@@ -62,12 +61,9 @@ def step5(client_id, client_secret, code_verifier, code):
     }
     get_r = requests.get(get_url, params=get_params)
 
-    print('Status code')
-    print(get_r.status_code)
-    print('Content')
-    print(get_r.content)
-    print('Text')
-    print(get_r.text)
+    content = json.loads(get_r.content)['items']
+    for item in content:
+        print(item['title'])
 
 
 if __name__ == '__main__':
