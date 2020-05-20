@@ -57,7 +57,8 @@ def step5(client_id, client_secret, code_verifier, code):
 
     get_url = 'https://www.googleapis.com/drive/v2/files'
     get_params = {
-        'access_token': access_token
+        'access_token': access_token,
+        'q': '"root" in parents'
     }
     get_r = requests.get(get_url, params=get_params)
 
